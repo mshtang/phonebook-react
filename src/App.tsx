@@ -11,14 +11,6 @@ export interface Contact {
   number: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const initialState = [
-  { name: 'Arto Hellas', number: '040-123456', id: 1 },
-  { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
-  { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
-  { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 },
-];
-
 function App() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [newName, setNewName] = useState('');
@@ -50,6 +42,10 @@ function App() {
         return;
       } else {
         const existingContact = contacts.find((p) => p.name === newName);
+        const shouldReplace = window.confirm(
+          `${newName} has a different number now. Update the number ${existingContact.number} with ${newNumber}?`,
+        );
+        if (!shouldReplace) return;
         contactService
           .update(existingContact.id, { ...existingContact, number: newNumber })
           .then((returnedContact) => {
