@@ -45,8 +45,24 @@ function App() {
   function handleSubmitForm(e: FormEvent<HTMLFormElement>): void {
     e.preventDefault();
     if (contacts.some((p) => p.name === newName)) {
-      alert(`${newName} is already added to phone book`);
-      return;
+      if (contacts.some((p) => p.number === newNumber)) {
+        alert(`${newName} is already added to phone book`);
+        return;
+      } else {
+        const existingContact = contacts.find((p) => p.name === newName);
+        contactService
+          .update(existingContact.id, { ...existingContact, number: newNumber })
+          .then((returnedContact) => {
+            setContacts(
+              contacts.map((c) =>
+                c.id !== returnedContact.id ? c : returnedContact,
+              ),
+            );
+          });
+        setNewName('');
+        setNewNumber('');
+        return;
+      }
     }
     contactService
       .create({ name: newName, number: newNumber })

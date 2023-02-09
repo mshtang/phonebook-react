@@ -14,7 +14,9 @@ const create = (newObject: Contact): Promise<Contact> =>
   axios.post(baseUrl, newObject).then((response) => response.data);
 
 const update = (id: number, updatedObject: Contact): Promise<Contact> =>
-  axios.put(baseUrl, updatedObject).then((response) => response.data);
+  axios
+    .put(`${baseUrl}/${id}`, updatedObject)
+    .then((response) => response.data);
 
 const deleteContact = (id: number): Promise<Contact> =>
   axios.delete(`${baseUrl}/${id}`).then((response) => response.data);

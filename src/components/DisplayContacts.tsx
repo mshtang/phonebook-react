@@ -27,7 +27,7 @@ const DisplayContacts: React.FC<DisplayContactsProps> = ({
     <div>
       {filteredContacts.map((contact) => (
         <ContactDetail
-          key={contact.name}
+          key={contact.id}
           id={contact.id}
           name={contact.name}
           number={contact.number}
