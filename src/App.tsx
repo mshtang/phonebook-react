@@ -1,10 +1,12 @@
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import './App.css';
 import AddNewContact from './components/AddNewContact';
 import DisplayContacts from './components/DisplayContacts';
 import SearchContact from './components/SearchField';
+import contactService from './services/contacts';
 
-interface Contact {
+export interface Contact {
+  id?: number;
   name: string;
   number: string;
 }
@@ -22,6 +24,15 @@ function App() {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [keyword, setKeyword] = useState('');
+  const [currentContactsLength, setCurrentContactsLength] = useState(
+    contacts.length,
+  );
+
+  useEffect(() => {
+    contactService
+      .getAll()
+      .then((initialContacts) => setContacts(initialContacts));
+  }, []);
 
   function handleChangeName(e: ChangeEvent<HTMLInputElement>): void {
     setNewName(e.currentTarget.value);
@@ -37,15 +48,31 @@ function App() {
       alert(`${newName} is already added to phone book`);
       return;
     }
-
-    setContacts([...contacts, { name: newName, number: newNumber }]);
-    setNewName('');
-    setNewNumber('');
+    contactService
+      .create({ name: newName, number: newNumber })
+      .then((returnedContact) => {
+        setContacts([
+          ...contacts,
+          {
+            id: returnedContact.id,
+            name: returnedContact.name,
+            number: returnedContact.number,
+          },
+        ]);
+        setNewName('');
+        setNewNumber('');
+      });
   }
 
   function handleTypingInSearchField(e: ChangeEvent<HTMLInputElement>): void {
     e.preventDefault();
     setKeyword(e.target.value);
+  }
+
+  function handleContactDeleted(id: number): void {
+    setContacts((prevContacts) =>
+      prevContacts.filter((contact) => contact.id !== id),
+    );
   }
 
   return (
@@ -63,8 +90,13 @@ function App() {
         name={newName}
         number={newNumber}
       />
-      <h2>Numbers</h2>
-      <DisplayContacts contacts={contacts} keyword={keyword} />
+      <h2>Showing {currentContactsLength} Numbers</h2>
+      <DisplayContacts
+        contacts={contacts}
+        keyword={keyword}
+        onContactDeleted={handleContactDeleted}
+        setCurrentLength={setCurrentContactsLength}
+      />
     </div>
   );
 }
