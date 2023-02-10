@@ -19,6 +19,7 @@ function App() {
   const [currentContactsLength, setCurrentContactsLength] = useState(
     contacts.length,
   );
+  const [notification, setNotification] = useState<string | null>(null);
 
   useEffect(() => {
     contactService
@@ -36,8 +37,9 @@ function App() {
 
   function handleSubmitForm(e: FormEvent<HTMLFormElement>): void {
     e.preventDefault();
-    if (contacts.some((p) => p.name === newName)) {
-      if (contacts.some((p) => p.number === newNumber)) {
+    const existingContact = contacts.find((p) => p.name === newName);
+    if (existingContact) {
+      if (existingContact.number === newNumber) {
         alert(`${newName} is already added to phone book`);
         return;
       } else {
@@ -46,34 +48,53 @@ function App() {
           `${newName} has a different number now. Update the number ${existingContact.number} with ${newNumber}?`,
         );
         if (!shouldReplace) return;
-        contactService
-          .update(existingContact.id, { ...existingContact, number: newNumber })
-          .then((returnedContact) => {
-            setContacts(
-              contacts.map((c) =>
-                c.id !== returnedContact.id ? c : returnedContact,
-              ),
-            );
-          });
-        setNewName('');
-        setNewNumber('');
+        updateContact(existingContact.id, {
+          ...existingContact,
+          number: newNumber,
+        });
         return;
       }
     }
-    contactService
-      .create({ name: newName, number: newNumber })
-      .then((returnedContact) => {
-        setContacts([
-          ...contacts,
-          {
-            id: returnedContact.id,
-            name: returnedContact.name,
-            number: returnedContact.number,
-          },
-        ]);
-        setNewName('');
-        setNewNumber('');
-      });
+    createContact({ name: newName, number: newNumber });
+    resetForm;
+  }
+
+  function updateContact(id: number, updatedContact: Contact) {
+    contactService.update(id, updatedContact).then((returnedContact) => {
+      setContacts(
+        contacts.map((c) =>
+          c.id !== returnedContact.id ? c : returnedContact,
+        ),
+      );
+      setNotification(
+        `${returnedContact.name} is updated in the contact list.`,
+      );
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+    });
+  }
+
+  function createContact(contact: Contact) {
+    contactService.create(contact).then((returnedContact) => {
+      setContacts([
+        ...contacts,
+        {
+          id: returnedContact.id,
+          name: returnedContact.name,
+          number: returnedContact.number,
+        },
+      ]);
+      setNotification(`${returnedContact.name} is added to the contact list.`);
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+    });
+  }
+
+  function resetForm() {
+    setNewName('');
+    setNewNumber('');
   }
 
   function handleTypingInSearchField(e: ChangeEvent<HTMLInputElement>): void {
@@ -102,6 +123,8 @@ function App() {
         name={newName}
         number={newNumber}
       />
+      {notification && <p className="Notification">{notification}</p>}
+      {true && <p className="Notification">Notification</p>}
       <h2>Showing {currentContactsLength} Numbers</h2>
       <DisplayContacts
         contacts={contacts}
