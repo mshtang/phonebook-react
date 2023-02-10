@@ -16,38 +16,36 @@ const AddNewContact: React.FC<AddNewContactProps> = ({
   handleSubmitForm,
 }) => {
   return (
-    <form onSubmit={handleSubmitForm}>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'start',
-          alignItems: 'flex-end',
-        }}
-      >
-        <div>
-          name:{' '}
-          <input
-            name="newName"
-            onChange={handleChangeName}
-            value={name}
-            className="MdInput"
-          />
-        </div>
-        <div>
-          number:{' '}
-          <input
-            className="MdInput"
-            name="newNumber"
-            onChange={handleChangeNumber}
-            value={number}
-          />
-        </div>
-        <div>
-          <button className="MdButton" type="submit">
-            add
-          </button>
-        </div>
-      </div>
+    <form
+      onSubmit={handleSubmitForm}
+      style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'start',
+        alignItems: 'center',
+      }}
+    >
+      <input
+        style={{ flexGrow: '2' }}
+        type="text"
+        placeholder="Name"
+        name="newName"
+        onChange={handleChangeName}
+        value={name}
+        className="MdInput"
+      />
+      <input
+        style={{ flexGrow: '3' }}
+        type="text"
+        placeholder="Number"
+        className="MdInput"
+        name="newNumber"
+        onChange={handleChangeNumber}
+        value={number}
+      />
+      <button className="MdButton" type="submit" style={{ flexGrow: '1' }}>
+        Add
+      </button>
     </form>
   );
 };

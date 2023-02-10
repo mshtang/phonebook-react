@@ -89,11 +89,11 @@
 }
 
 .MdInput {
+  margin: 0.5rem;
   width: 150px;
-  padding: 10px;
-  border-radius: 5px;
+  padding: 0.75rem 1rem;
+  border-radius: 0.25rem;
   border: 1px solid #282c34;
-  box-shadow: 0px 0px 10px #ddd;
-  font-size: 16px;
-  background: linear-gradient(#fff, #cecbcb);
+  box-shadow: 0px 0px 0.5rem #ddd;
+  background: hsl(0 0% 93%);
 }

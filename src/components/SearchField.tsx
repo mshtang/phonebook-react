@@ -11,8 +11,8 @@ const SearchContact: React.FC<SearchContactProps> = ({
 }) => {
   return (
     <div>
-      <label htmlFor="searchField">Filter shown with: </label>
       <input
+        placeholder="Filter shown with"
         name="searchField"
         value={keyword}
         className="MdInput"
