@@ -1,7 +1,11 @@
+import { AxiosError } from 'axios';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import './App.css';
 import AddNewContact from './components/AddNewContact';
 import DisplayContacts from './components/DisplayContacts';
+import NotificationBox, {
+  NotificationBoxProps,
+} from './components/NotificationBox';
 import SearchContact from './components/SearchField';
 import contactService from './services/contacts';
 
@@ -19,7 +23,7 @@ function App() {
   const [currentContactsLength, setCurrentContactsLength] = useState(
     contacts.length,
   );
-  const [notification, setNotification] = useState<string | null>(null);
+  const [notification, setNotification] = useState<NotificationBoxProps>(null);
 
   useEffect(() => {
     contactService
@@ -60,19 +64,32 @@ function App() {
   }
 
   function updateContact(id: number, updatedContact: Contact) {
-    contactService.update(id, updatedContact).then((returnedContact) => {
-      setContacts(
-        contacts.map((c) =>
-          c.id !== returnedContact.id ? c : returnedContact,
-        ),
-      );
-      setNotification(
-        `${returnedContact.name} is updated in the contact list.`,
-      );
-      setTimeout(() => {
-        setNotification(null);
-      }, 3000);
-    });
+    contactService
+      .update(id, updatedContact)
+      .then((returnedContact) => {
+        setContacts(
+          contacts.map((c) =>
+            c.id !== returnedContact.id ? c : returnedContact,
+          ),
+        );
+        setNotification(() => {
+          return {
+            message: `${returnedContact.name} is updated in the contact list.`,
+            isError: false,
+          };
+        });
+        setTimeout(() => {
+          setNotification(null);
+        }, 3000);
+      })
+      .catch((error: Error | AxiosError) => {
+        setNotification(() => {
+          return {
+            message: error.message,
+            isError: true,
+          };
+        });
+      });
   }
 
   function createContact(contact: Contact) {
@@ -85,7 +102,12 @@ function App() {
           number: returnedContact.number,
         },
       ]);
-      setNotification(`${returnedContact.name} is added to the contact list.`);
+      setNotification(() => {
+        return {
+          message: `${returnedContact.name} is added to the contact list.`,
+          isError: false,
+        };
+      });
       setTimeout(() => {
         setNotification(null);
       }, 3000);
@@ -102,10 +124,19 @@ function App() {
     setKeyword(e.target.value);
   }
 
-  function handleContactDeleted(id: number): void {
+  function handleContactDeleted(id: number) {
     setContacts((prevContacts) =>
       prevContacts.filter((contact) => contact.id !== id),
     );
+  }
+
+  function handleContactDeletedError(error: string) {
+    setNotification(() => {
+      return {
+        message: error,
+        isError: true,
+      };
+    });
   }
 
   return (
@@ -123,13 +154,18 @@ function App() {
         name={newName}
         number={newNumber}
       />
-      {notification && <p className="Notification">{notification}</p>}
-      {true && <p className="Notification">Notification</p>}
+      {notification && (
+        <NotificationBox
+          message={notification.message}
+          isError={notification.isError}
+        />
+      )}
       <h2>Showing {currentContactsLength} Numbers</h2>
       <DisplayContacts
         contacts={contacts}
         keyword={keyword}
         onContactDeleted={handleContactDeleted}
+        onContactDeletedError={handleContactDeletedError}
         setCurrentLength={setCurrentContactsLength}
       />
     </div>

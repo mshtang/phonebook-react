@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import React, { useState } from 'react';
 import contactService from '../services/contacts';
 
@@ -6,6 +7,7 @@ interface ContactDetailProps {
   name: string;
   number: string;
   onContactDeleted: (id: number) => void;
+  onContactDeletedError: (error: string) => void;
 }
 
 const ContactDetail: React.FC<ContactDetailProps> = ({
@@ -13,6 +15,7 @@ const ContactDetail: React.FC<ContactDetailProps> = ({
   name,
   number,
   onContactDeleted,
+  onContactDeletedError,
 }) => {
   const [showDeleteButton, setShowDeleteButton] = useState(false);
   const [borderStyle, setBorderStyle] = useState({
@@ -25,9 +28,14 @@ const ContactDetail: React.FC<ContactDetailProps> = ({
 
   function deleteContact(): void {
     if (window.confirm(`Delete ${name}?`)) {
-      contactService.deleteContact(id).then(() => {
-        onContactDeleted(id);
-      });
+      contactService
+        .deleteContact(id)
+        .then(() => {
+          onContactDeleted(id);
+        })
+        .catch((error: Error | AxiosError) => {
+          onContactDeletedError(error.message);
+        });
     }
   }
 

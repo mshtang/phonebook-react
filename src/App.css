@@ -106,3 +106,12 @@
   background-color: #d3d3d3;
   box-shadow: 0 0 1rem #068b42;
 }
+
+.Notification-error {
+  border: 3px solid #a80505;
+  border-radius: 0.25rem;
+  margin: 5px;
+  padding: 0.5rem;
+  background-color: #d3d3d3;
+  box-shadow: 0 0 1rem #a80505;
+}
