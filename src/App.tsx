@@ -47,7 +47,6 @@ function App() {
         alert(`${newName} is already added to phone book`);
         return;
       } else {
-        const existingContact = contacts.find((p) => p.name === newName);
         const shouldReplace = window.confirm(
           `${newName} has a different number now. Update the number ${existingContact.number} with ${newNumber}?`,
         );
@@ -89,6 +88,9 @@ function App() {
             isError: true,
           };
         });
+        setTimeout(() => {
+          setNotification(null);
+        }, 3000);
       });
   }
 
